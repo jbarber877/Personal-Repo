@@ -1,3 +1,11 @@
+# Jared Barber
+# University of Flordida Intro to Computer Organization CDA 3101 Spring 2022
+# ------------------------------------------------------------------------------------------
+# This file was written for use with the Quemu Arm emulator using Legv8. 
+# The code takes a string as input, calculates the length of the string, and determines whether
+# the string is a plaindrome
+#--------------------------------------------------------------------------------------------
+
 .section .data
 
 input_prompt    :   .asciz  "Input a string: "
