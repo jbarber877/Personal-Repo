@@ -1,0 +1,135 @@
+.section .data
+
+input_x_prompt : .asciz "Please enter x: "
+input_y_prompt : .asciz "Please enter y: "
+input_spec : .asciz "%d"
+result : .asciz "x^y = %d\n"
+
+.section .text
+
+.global main
+
+power:
+	#check if x == 0
+	cbz x0, retZero
+	# check if y <= 0
+	subs x9, x1, xzr
+	b.gt endif
+	# check if y == 0
+	cbz x1, retOne
+	# y < 0
+	b retZero
+
+	endif:
+		# check if x == 1
+		subs x11, x0, #1
+		b.eq retOne
+		# check if y == 1
+		subs x11, x1, #1
+		b.eq retX
+
+		# create a stack frame - need x0, x1, fp, return address
+		sub sp, sp, #32
+		stur x0, [sp, #24]
+		stur x1, [sp, #16]
+		stur x29, [sp, #8]
+		stur x30, [sp, #0]
+		# subtract 1 from y
+		sub x1, x1, #1
+		# recursive function call
+		bl power
+		# restore stack
+		ldur x0, [sp, #24]
+		ldur x1, [sp, #16]
+		ldur x29, [sp, #8]
+		ldur x30, [sp, #0]
+		add sp, sp, #32
+
+		# return from power is in x2, multiply by x
+		mul x2, x2, x0
+		b ret
+
+	retZero:
+		# insert 0 into the return register (x2)
+		add x2, xzr, xzr
+		b ret
+
+	retOne:
+		# insert 1 into the return register (x2)
+		mov x2, 1
+		b ret
+
+	retX:
+		# insert x into the return register (x2) 
+		mov x2, x0
+		b ret
+
+	ret:
+		br x30
+
+main:
+    # create x and y
+	stp x29, x30, [sp, -16]!
+	mov x29, sp
+
+	# Prompt for x
+	ldr x0, =input_x_prompt
+	bl printf
+
+	sub sp, sp, #16
+	ldr x0, =input_spec
+	mov x1, sp
+	bl scanf
+
+	# save the value from the stack
+	ldursw x19, [sp]
+
+	# Prompt for y
+	ldr x0, =input_y_prompt
+	bl printf
+
+	ldr x0, =input_spec
+	#add x2, sp, 8
+	mov x1, sp
+	bl scanf
+
+	# save the value from the stack
+	ldursw x20, [sp]
+
+	#restore the stack
+	add sp, sp, #16
+
+	# X is now stored in x19
+	# Y is now stored in x20
+
+    # create stack frame and call power function
+    sub sp, sp, 32
+    stur x19, [sp, #16]
+    stur x20, [sp, #8]
+    stur x30, [sp, #0]
+
+    mov x0, x19
+    mov x1, x20
+    bl power
+
+    # store the result
+    mov x12, x2
+
+    # restore variables from stack frame and deallocate
+    ldur x19, [sp, #16]
+    ldur x20, [sp, #8]
+    ldur x30, [sp, #0]
+    add sp, sp, 32
+
+	# Print the result
+	ldr x0, =result
+	mov x1, x12
+	bl printf
+	b exit
+
+exit:
+	mov x0, 0
+	mov x8, 93
+	svc 0
+	ret
+

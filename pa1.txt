@@ -1,0 +1,112 @@
+.section .data
+
+input_prompt    :   .asciz  "Input a string: "
+input_spec      :   .asciz  "%[^\n]"
+length_spec     :   .asciz  "String length: %d\n"
+palindrome_spec :   .asciz  "String is a palindrome (T/F): %c\n"
+
+f_format		:	.asciz "F\n"
+t_format		:	.asciz "T\n"
+
+input:			.space	8
+
+.section .text
+
+.global main
+
+main:
+	# Prints "Input a string".
+	ldr x0, =input_prompt	
+	bl printf				
+
+	# Reads the input string.
+	ldr x0, =input_spec		
+	ldr x1, =input			
+	bl scanf
+
+	# Calculates the length of the string and outputs the string length to the console.
+	ldr x24, =input
+    	add x19, xzr, xzr
+	bl get_length
+
+	#Determines if the string is a palindrome and outputs whether the string is a palindrome.
+	ldr x24, =input
+	bl is_palindrome
+
+
+	b exit	
+	
+get_length:
+	# Calculates the length of the string
+
+	# Get the character at the current index (x19)
+	ldrb w20, [x24,x19]
+	# Get the an empty character
+	ldrb w21, [x24, 8]
+	# If the character at the current index is an empty character, stop counting and print the length
+	sub x22, x20, x21
+	cbz x22, print_length
+	# Otherwise, increment the counter
+	add x19, x19, 1
+	bl get_length
+
+print_length:
+	# Outputs the string length to the console
+	ldr x0, =length_spec
+	mov x1, x19
+	bl printf
+
+is_palindrome:
+	# Calculates whether the string is a palindrome
+
+	#x4 = lower = 0
+	add x4, xzr, xzr
+	#x5 = upper = input.length()-1
+	sub x5, x19, 1
+
+	Loop:
+		# if upper - lower == 0 or == 1, the middle of the string has been reached
+		subs x6, x5, x4
+		b.gt Else
+		b print_true
+
+	Else:
+		# if input[i] != input[length -i] print false
+		ldrb w25, [x24, x4]
+		ldrb w26, [x24, x5]
+		sub x27, x25, x26
+		cbnz x27, print_false
+
+		add x4, x4, 1
+		sub x5, x5, 1
+		b Loop
+
+print_true:
+	# Load "T"
+	ldr x2, =t_format
+	# Load palindrome_spec
+	ldr x0, =palindrome_spec
+	# pass "T" as a char
+	ldrb w1, [x2, 0]
+	
+	bl printf
+	b exit
+
+
+
+print_false:
+	# Load "F"
+	ldr x2, =f_format
+	# Load palindrome_spec
+	ldr x0, =palindrome_spec
+	# pass "T" as a char
+	ldrb w1, [x2, 0]
+	
+	bl printf
+	b exit
+
+exit:
+	mov x0, 0
+	mov x8, 93
+	svc 0
+	ret
