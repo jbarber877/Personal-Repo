@@ -4,23 +4,15 @@ Repository of Personal and School Projects
 ## Computer Organization
 From CDA 3101 Spring 2022. Contains ARM code written for use with the Quemu Arm emulator using Legv8. Scripts are stored in txt format for grading and readability
 
-| Arm
+### Arm
+pa1.txt |    The code takes a string as input, calculates the length of the string, and determines whetherthe string is a palindrome
 
-|--- pa1.txt 
+pa2.txt |    The code takes two integer inputs, x and y, and recursively calculates x ^ y. If y is <= 0, the output is assumed to be zero.
 
-|    The code takes a string as input, calculates the length of the string, and determines whetherthe string is a palindrome
+### Cache
+Cache.cpp |    C++ code simulates a computer cache to compare efficiency. Includes direct mapped, full associative, and set associative caches using FIFO and LRU replacement.
 
-|--- pa2.txt
-
-|    The code takes two integer inputs, x and y, and recursively calculates x ^ y. If y is <= 0, the output is assumed to be zero.
-|Cache
-
-|--- Cache.cpp
-
-|    C++ code simulates a computer cache to compare efficiency. Includes direct mapped, full associative, and set associative caches using FIFO and LRU replacement.
-|--- Cache Analysis
-
-|    Analysis of the results of Cache.cpp
+Cache Analysis |    Analysis of the results of Cache.cpp
 
 ## Data Structures
 Built-from scratch implementations of common data structures in Computer Science
