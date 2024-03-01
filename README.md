@@ -30,13 +30,23 @@ Java implementation of connect 4
 
 ## Operating Systems
 Exercises from COP4600 Fall 2022
-| Exercise 0
-| Exercise 1
-| Exercise 2
-| Exercise 3
-| Exercise 4
-| Exercise 5
-| Exercise 6
-| Exercise 7
-| Exercise 8
-| Exercise 9
+
+Exercise 0
+
+Exercise 1
+
+Exercise 2
+
+Exercise 3
+
+Exercise 4
+
+Exercise 5
+
+Exercise 6
+
+Exercise 7
+
+Exercise 8
+
+Exercise 9
