@@ -1,0 +1,15 @@
+diff --git a/init/main.c b/init/main.c
+index 02f6b6bd6a17..741a7b42a470 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -1108,8 +1108,8 @@ static int __ref kernel_init(void *unused)
+ 
+ 	system_state = SYSTEM_RUNNING;
+ 	numa_default_policy();
+-
++
+-        printk(KERN_CRIT  "\n##### Jared Barber (UFID: 1234-5678) Hello COP4600 #####\n");
++        printk(KERN_CRIT  "\n### Jared Barber (Exercise 2) ###\n");
+ 	rcu_end_inkernel_boot();
+ 
+ 	if (ramdisk_execute_command) {
