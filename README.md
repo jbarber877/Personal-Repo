@@ -24,6 +24,8 @@ C++ implementation of a MinHeap, a binary tree data structure where the value of
 C++ implementation of a splay tree, a self-adjusting binary search tree where frequently accessed nodes are moved closer to the root to improve access times, utilizing the splay operation for efficient restructuring.
 ##### StackQueue.py
 Python implementation of stack and queue, LIFO and FIFO data structures.
+##### AVL Tree
+C++ implementation of an AVL tree, a self-balancing binary tree.
 
 ## Lab 6
 Java implementation of connect 4
