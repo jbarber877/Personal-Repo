@@ -27,6 +27,11 @@ Python implementation of stack and queue, LIFO and FIFO data structures.
 ##### AVL Tree
 C++ implementation of an AVL tree, a self-balancing binary tree.
 
+## Algorithms
+Built-from scratch implementations of common algorithms in Computer Science
+##### PageRank.cpp
+C++ implementation of page rank algorithm and example usage
+
 ## Lab 6
 Java implementation of connect 4
 
