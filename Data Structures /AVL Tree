@@ -1,0 +1,542 @@
+#include <stdio.h>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <queue>
+#include <stack>
+
+using namespace std;
+
+class avlTree {
+public:
+    // Definition of the Node class
+    struct Node {
+        int ID;
+        string NAME;
+        Node* left;
+        Node* right;
+
+        Node(int _id, string _name) : ID(_id), NAME(_name)
+        {
+            left = nullptr;
+            right = nullptr;
+        }
+    };
+
+    // Function declarations
+    Node* insert(string NAME, int ID);
+    Node* remove(int ID);
+    void search(int ID);
+    void search(string NAME);
+
+    void printInorder(Node* root);
+    void printPreorder(Node* root);
+    void printPostorder(Node* root);
+    void printLevelCount(Node* root);
+
+    void removeInorder(Node* treeRoot, Node* localRoot, int N);
+
+    // keep track of the root node
+    Node* root = nullptr;
+
+private:
+    // Helper functions
+    Node* insertRecursive(Node* root, Node* new_node, int& r);
+    int height(Node* root);
+    int getBalanceFactor(Node* root);
+    Node* getPredeccessor(Node* node);
+    Node* rightRotate(Node* oldRoot);
+    Node* leftRotate(Node* oldRoot);
+    Node* removeHelper(Node* root, int ID, int& success);
+    void preorderSearch(Node* root, vector<int>& vec, string _name);
+    void findInorder(Node* treeRoot, Node* localRoot, int N, int& nodeValue);
+
+
+};
+
+//Public function definitions
+avlTree::Node* avlTree::insert(string NAME, int ID) {
+    //Add a Student object into the tree with the specified name, NAMEand GatorID number, ID.
+    //Also, prints “successful” if insertion is successfuland prints “unsuccessful” otherwise.
+
+    // Check that the name is valid. It must include only alphabets from[a - z, A - Z, and spaces]
+    bool validName = true;
+    string copy = NAME;
+    
+    for (unsigned int i = 0; i < copy.size(); i++) {
+        if (!isalpha(copy[i]) && !isspace(copy[i])) {
+            validName = false;
+        }
+    }
+
+    if (!validName) {
+        cout << "unsuccessful" << endl;
+        return root;
+    }
+
+    // Check that the ID is valid. UFIDs are strictly 8 digits long. 
+    bool validID = true;
+    string copyID = to_string(ID);
+
+    if (copyID.size() != 8)
+        validID = false;
+    for (unsigned int i = 0; i < copyID.size(); i++) {
+        if (!isdigit(copyID[i])) {
+            validID = false;
+        }
+    }
+
+    if (!validID) {
+        cout << "unsuccessful" << endl;
+        return root;
+    }
+
+    // Create a new node and a variable to indicate success
+    Node* new_node = new Node(ID, NAME);
+    int r = 0;
+
+    // Call helper function
+    root = insertRecursive(root, new_node, r);
+
+    (r == -1) ? cout << "unsuccessful" << endl : cout << "successful" << endl;
+    return root;
+}
+
+avlTree::Node* avlTree::remove(int ID) {
+    //Find and remove the account with the specified ID from the tree.
+    //If deletion is successful, print “successful”.
+    //If the ID does not exist within the tree, print “unsuccessful”.
+    int success = -1;
+
+    removeHelper(root, ID, success);
+
+    if (success == 1) {
+        cout << "successful" << endl;
+    }
+    else {
+        cout << "unsuccessful" << endl;
+    }
+    return root;
+}
+
+void avlTree::search(int ID) {
+    //Search for the student with the specified ID from the tree.
+    // If the ID was found, print out their NAME.
+    // If the ID does not exist within the tree, print “unsuccessful”.
+
+    Node* curr = root;
+
+    if (curr == nullptr) {
+        // The tree is empty, so the ID was not found
+        cout << "unsuccessful" << endl;
+        return;
+    }
+
+    while (true) {
+        // If the ID is equal to a node in the list, the ID was found
+        if (ID == curr->ID) {
+            cout << curr->NAME << endl;
+            return;
+        }
+        if (ID < curr->ID) {
+            //If there is no left, the ID cannot be found
+            if (curr->left == nullptr) {
+                cout << "unsuccessful" << endl;
+                return;
+            }
+            // Otherwise, continue
+            curr = curr->left;
+            continue;
+        }
+        else {// key must be > curr->val                      
+            //If there is no right, the ID cannot be found
+            if (curr->right == nullptr) {
+                cout << "unsuccessful" << endl;
+                return;
+            }
+            // Otherwise, continue
+            curr = curr->right;
+            continue;
+        }
+    }
+}
+
+void avlTree::search(string NAME) {
+    //Search for the student with the specified name, NAME in the tree.    
+
+    // Search through the list in preorder traversal
+    vector<int> matchingID;
+    preorderSearch(root, matchingID, NAME);
+
+    //If the name has been found, print the corresponding ID(s). Else print unsuccessful.
+    if (matchingID.size() == 0) {
+        cout << "unsuccessful" << endl;
+        return;
+    }
+
+    for (int i : matchingID)
+        cout << i << endl;
+}
+
+void avlTree::printInorder(Node* root) {
+    //Print out a comma separated inorder traversal of the names in the tree.
+
+    // If the tree is empty, print an empty string
+    if (root == nullptr) {
+        cout << "";
+        return;
+    }
+
+    printInorder(root->left);
+    if (root->left != nullptr)
+        std::cout << ", ";
+    std::cout << root->NAME;
+    if (root->right != nullptr)
+        std::cout << ", ";
+    printInorder(root->right);
+
+}
+
+void avlTree::printPreorder(Node* root) {
+    //Print out a comma separated preorder traversal of the names in the tree.
+
+    // If the tree is empty, print an empty string
+    if (root == nullptr) {
+        cout << "";
+        return;
+    }
+
+    cout << root->NAME;
+    if (root->left || root->right)
+        cout << ", ";
+    printPreorder(root->left);
+    if (root->left && root->right)
+        cout << ", ";
+    printPreorder(root->right);
+}
+
+void avlTree::printPostorder(Node* root) {
+    //Print out a comma separated postorder traversal of the names in the tree.
+
+    // If the tree is empty, print an empty string
+    if (root == nullptr) {
+        cout << "";
+        return;
+    }
+
+    printPostorder(root->left);
+    if (root->left != nullptr)
+        cout << ", ";
+    printPostorder(root->right);
+    if (root->right != nullptr)
+        cout << ", ";
+    cout << root->NAME;
+}
+
+void avlTree::printLevelCount(Node* root) {
+    // Prints the number of levels that exist in the tree.
+    // Print 0 if the head of the tree is null.
+    cout << height(root) << endl;
+}
+
+void avlTree::removeInorder(Node* treeRoot, Node* localRoot, int N) {
+    // Remove the Nth GatorID from the inorder traversal of the tree(N = 0 for the first item, etc).
+
+    // nodeValue is passed to the helper function as a reference. It will hold the node's ID if
+    // successful, and -1 otherwise.
+
+    int nodeValue = -1;
+    findInorder(treeRoot, localRoot, N + 1, nodeValue);
+
+    if (nodeValue == -1) {
+        cout << "unsuccessful" << endl;
+    }
+    else {
+        remove(nodeValue);
+    }
+}
+
+// Private helper functions
+avlTree::Node* avlTree::insertRecursive(Node* root, Node* new_node, int& r) {
+    //Add a Student object into the tree with the specified name, NAMEand GatorID number, ID.
+
+    // If no tree exists, create a new one.
+    if (root == nullptr) {
+        root = new_node;
+        return root;
+    }
+    if (new_node->ID < root->ID) {
+        // If the root exists and is greater than the new node, move left
+        root->left = insertRecursive(root->left, new_node, r);
+    }
+    else if (new_node->ID > root->ID) {
+        // If the root exists and is less than the new node, move right
+        root->right = insertRecursive(root->right, new_node, r);
+    }
+    else {
+        // new_node->ID must be equal to root->ID
+        // the insertion fails because IDs cannot be repeated.
+        r = -1;
+        return root;
+    }
+
+    //Balance the tree automatically if necessary.
+    int balanceFactor = getBalanceFactor(root);
+    if ((balanceFactor > 1) && (new_node->ID < root->left->ID)) {
+        // left left imbalance
+        return rightRotate(root);
+    }
+    if ((balanceFactor < -1) && (new_node->ID > root->right->ID)) {
+        // right right imbalance
+        return leftRotate(root);
+    }
+    if ((balanceFactor > 1) && (new_node->ID > root->left->ID)) {
+        // right left imbalance
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    if ((balanceFactor < -1) && (new_node->ID < root->right->ID)) {
+        // left right imbalance
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+    return root;
+}
+
+int avlTree::height(Node* root) {
+    //returns the number of levels in the tree.
+
+    queue<Node*> q;
+    q.push(root);
+    int i = 0;
+
+    //Return 0 if the head of the tree is null.
+    if (root == nullptr) {
+        return 0;
+    }
+
+    // Otherwise, iterate through the tree and return the number of levels
+    while (!q.empty())
+    {
+        int nodeCount = q.size();
+
+        while (nodeCount > 0) {
+            Node* node = q.front();
+            q.pop();
+
+            if (node->left != nullptr)
+                q.push(node->left);
+            if (node->right != nullptr)
+                q.push(node->right);
+            nodeCount--;
+        }
+        i++;
+    }
+    return i;
+}
+
+int avlTree::getBalanceFactor(Node* root) {
+    if (root == nullptr) {
+        return -1;
+    }
+    else {
+        return (height(root->left) - height(root->right));
+    }
+}
+
+avlTree::Node* avlTree::rightRotate(Node* oldRoot) {
+    Node* newRoot = oldRoot->left;
+    Node* newLeft = newRoot->right;
+
+    // Perform rotation
+    newRoot->right = oldRoot;
+    oldRoot->left = newLeft;
+    return newRoot;
+}
+
+avlTree::Node* avlTree::leftRotate(Node* oldRoot) {
+    Node* newRoot = oldRoot->right;
+    Node* newRight = newRoot->left;
+
+    // Perform rotation
+    newRoot->left = oldRoot;
+    oldRoot->right = newRight;
+    return newRoot;
+}
+
+avlTree::Node* avlTree::removeHelper(Node* root, int ID, int& success) {
+    //Find and remove the account with the specified ID from the tree.
+    // Store success in the success reference variable
+
+    if (root == nullptr) {
+        // The item is not in the tree
+        return root;
+    }
+    // Compare the item to data at the local root
+    if (ID < root->ID) {
+        // Return the result of deleting from the left subtree
+        root->left = removeHelper(root->left, ID, success);
+    }
+    else if (ID > root->ID) {
+        // Return the result of deleting from the right subtree
+        root->right = removeHelper(root->right, ID, success);
+    }
+    else { // The ID is in the local root
+        if (root->left == nullptr && root->right == nullptr) {
+            // The local root has no children
+            //set the parent of the local root to reference null
+            root = nullptr;
+            success = 1;
+            return root;
+        }
+        if (root->left == nullptr) {
+            // the local root has a right child only
+            // set the parent of the local root to equal the right child
+            Node* temp = root->right;
+            free(root);
+            success = 1;
+            return temp;
+        }
+        else if (root->right == NULL) {
+            // same if the root has left child only
+            Node* temp = root->left;
+            free(root);
+            success = 1;
+            return temp;
+        }
+        //You must prioritize replacing a removed node with its inorder successor for the case where the deleted node has two children.
+        Node* temp = getPredeccessor(root->right);
+        root->ID = temp->ID;
+        root->NAME = temp->NAME;
+        root->right = removeHelper(root->right, temp->ID, success);
+        success = 1;
+    }
+    return root;
+}
+
+avlTree::Node* avlTree::getPredeccessor(Node* node) {
+    Node* curr = node;
+    while (curr != nullptr && curr->left != nullptr)
+        curr = curr->left;
+    return curr;
+}
+
+void avlTree::preorderSearch(Node* root, vector<int>& vec, string _name) {
+    // Helper function used to find all names matching the input parameter
+    if (root != nullptr) {
+        if (root->NAME == _name) {
+            // Need to use a vector in case there is more than one match
+            vec.push_back(root->ID);
+        }
+        preorderSearch(root->left, vec, _name);
+        preorderSearch(root->right, vec, _name);
+    }
+}
+
+void avlTree::findInorder(Node* treeRoot, Node* localRoot, int N, int& nodeValue) {
+    // Find the Nth GatorID from the inorder traversal of the tree(N = 0 for the first item, etc).
+
+    static int count = 0;
+
+    if (localRoot == nullptr)
+        return;
+
+    if (count <= N) {
+        // Inorder traversal searches LNR
+        // Traverse the left subtree first
+        findInorder(treeRoot, localRoot->left, N, nodeValue);
+        count++;
+
+        // If the nth element of the tree is reached, store the ID and exit function
+        if (count == N) {
+            nodeValue = localRoot->ID;
+            return;
+        }
+
+        // Traverse the right subtree
+        findInorder(treeRoot, localRoot->right, N, nodeValue);
+    }
+}
+
+// Program execution begins here
+int main(int argc, char* argv[]) {
+
+    //Create a tree
+    avlTree a = avlTree();
+
+    // Get the number of commands 
+    int numCommands;
+    cin >> numCommands;
+
+    string command, name, temp, garbage;
+    int ID, N;
+
+    getline(cin, garbage);
+
+    for (int i = 0; i < numCommands; i++) {
+        cin >> command;
+
+        if (command == "insert") {
+            // NAME identifier will be separated by double inverted commas for parsing, e.g. "Josh Smith".
+            // use the garbage variable to remove the front quatation mark. getline will take care of the other
+            getline(cin, garbage, '"');
+            getline(cin, name, '"');
+            getline(cin, temp);
+            ID = stoi(temp);
+
+            a.root = a.insert(name, ID);
+        }
+        else if (command == "remove") {
+            getline(cin, temp);
+            ID = stoi(temp);
+            a.root = a.remove(ID);
+        }
+        else if (command == "search") {
+            getline(cin, temp);
+
+            // Check whether this is a number (search by ID) or a string (search by name)
+            bool isNumber = true;
+            for (unsigned int i = 0; i < temp.size(); i++) {
+                if (isalpha(temp[i])) {
+                    isNumber = false;
+                    break;
+                }
+            }
+
+            if (isNumber) {
+                ID = stoi(temp);
+                a.search(ID);
+            }
+            else {
+                // temp is not a number - it is a string with the " " still attached
+                temp.erase(remove(temp.begin(), temp.end(), '\"'), temp.end());
+                // the above slice leaves a space in front of the string which must be removed
+                temp = temp.substr(1, temp.size());
+                // Now ready to search
+                a.search(temp);
+            }
+        }
+        else if (command == "printInorder") {
+            a.printInorder(a.root);
+            cout << endl;
+        }
+        else if (command == "printPreorder") {
+            a.printPreorder(a.root);
+            cout << endl;
+        }
+        else if (command == "printPostorder") {
+            a.printPostorder(a.root);
+            cout << endl;
+        }
+        else if (command == "printLevelCount") {
+            a.printLevelCount(a.root);
+            getline(cin, garbage);
+        }
+        else if (command == "removeInorder") {
+            cin >> N;
+            a.removeInorder(a.root, a.root, N);
+        }
+    }
+
+    return 0;
+}
