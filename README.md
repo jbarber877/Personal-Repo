@@ -40,11 +40,19 @@ Exercises from COP4600 Fall 2022
 
 Exercise 0
 
+Set up and build Reptilian, a pairing of the Android and Ubuntu user space environments sharing the Linux Kernel. Output is a screenshot showing Reptilian terminal.
+
 Exercise 1
+
+Linux terminal commands. Create, zip, and unzip files, archives, and tar files, and view directory. Output are screenshots of the commands and a tar file.
 
 Exercise 2
 
+Patches, libraries, and makefiles. Create a static library to perform simple arithmetic operations and a makefile to compile that library.
+
 Exercise 3
+
+GDB/GNU debugger
 
 Exercise 4
 
@@ -52,8 +60,13 @@ Exercise 5
 
 Exercise 6
 
+IO Device Files. Create a virtual storage drive via a loopback device, and represent it as a file. Connect, mount, write, unmount, and verify data has been written to the file.
+
 Exercise 7
 
 Exercise 8
 
 Exercise 9
+
+## Statistics & R
+Exercises from STA 3022. Demonstrations of basic probability and statistics in R.
