@@ -16,6 +16,10 @@ C++ code simulates a computer cache to compare efficiency. Includes direct mappe
 ##### Cache Analysis
 Analysis of the results of Cache.cpp
 
+### Comp Tools
+##### abet.m / abet.mlx
+Matlab code for processing an audio file. Compares clean and noisy audio, designed and applied filters to remove noise, created custom noisy signals to filter different noise profiles. 
+
 ## Data Structures
 Built-from scratch implementations of common data structures in Computer Science
 ##### MinHeap.cpp
